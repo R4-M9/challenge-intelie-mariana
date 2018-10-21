@@ -1,3 +1,18 @@
+//This function will initialize a line chart with empy data.
+
+function initializeChart() {
+    var chartArea = $('#line-chart')[0];
+    var lineChart = new Chart(chartArea, {
+      type: 'line',
+    });
+};
+
+//When the document is ready, call the function to initialize the chart.
+
+$( document ).ready(function() {
+    initializeChart();
+});
+
 //This function will recover the data from the textArea, line by line, and
 //parse each string to a JSON Object.
 

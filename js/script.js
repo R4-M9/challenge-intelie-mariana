@@ -1,12 +1,54 @@
 //This function will initialize a line chart with empy data.
 
 function initializeChart() {
+  var $container = $('#line-chart'); //JQuery object that the chart will be ploted
+
+  var height= $container.height();
+  var width= $container.width();
+
+
+  Highcharts.setOptions({
+    global: {
+      useUTC: false //Set the time to local
+    }
+  });
+
+  var chartingOptions = {
+    chart: {
+      renderTo: $container[0],
+      margin: 0,
+      height: 400,
+      type: 'line'
+    },
+    title: {
+      text: ''
+    },
+    xAxis: {
+      type: 'datetime',
+      labels: {
+        format: "{value:%H:%M}"
+      }
+    },
+    yAxis: {
+      title: {
+        text: ''
+      }
+    },
+    legend: {
+      layout: 'vertical',
+      align: 'right',
+      verticalAlign: 'middle'
+    },
+    series: []
+  }
+
+  var chart = new Highcharts.Chart(chartingOptions);
 };
 
 //When the document is ready, call the function to initialize the chart.
 
 $( document ).ready(function() {
-    initializeChart();
+  initializeChart();
 });
 
 //This function will recover the data from the textArea, line by line, and

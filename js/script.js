@@ -1,10 +1,6 @@
 //This function will initialize a line chart with empy data.
 
 function initializeChart() {
-    var chartArea = $('#line-chart')[0];
-    var lineChart = new Chart(chartArea, {
-      type: 'line',
-    });
 };
 
 //When the document is ready, call the function to initialize the chart.

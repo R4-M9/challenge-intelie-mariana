@@ -1,24 +1,42 @@
-.main-wrapper {
-  display: grid;
-  grid-template-columns: 100px 100px 100px;
-  grid-gap: 5px;
-}
-
-.block {
-  text-align: center;
+.parent {
+  background: #888;
   padding: 20px;
+  color: #ffffff;
+  font-family: Arial;
+  font-size: 45px;
 }
 
+.title {
+  background: blue;
+}
 .textarea {
-  grid-column:1 / 8 ;
-  border: 3px solid orange;
+  background: green;
+}
+.output {
+  background: orange;
+}
+.generate-button {
+  background: red;
+}
+
+@media only screen and (min-width: 641px){
+  .parent {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media only screen and (min-width: 1025px){
+  .parent {
+    grid-template-columns: 1fr;
+  }
 }
 
 textarea {
   display: block;
   resize: none;
   width: 100%;
-  height: 200px;
+  height: 100px;
   max-width: 100%;
   max-height: 450px;
 }
@@ -28,14 +46,4 @@ textarea {
   font-family: 'source-code-pro', 'Courier New', monospace;
   font-size: 13px;
   line-height: 1.4;
-}
-
-.output {
-  grid-column:1 / 8 ;
-  border: 3px solid pink;
-}
-
-.generate{
-  grid-column:1 / 8;
-  border: 3px solid red;
 }

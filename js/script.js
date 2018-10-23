@@ -56,42 +56,20 @@ function initializeChart() {
         fontFamily: 'Source Sans Pro'
       }
     },
-    series: [{
-      name: 'Linux Chrome Min Response Time', //select: ['min', 'max'] --> min
-      data: [{ //all values from the min category
-        x: 1519862400000,
-        y: 0.1
-      },
-      {
-        x: 1519862460000,
-        y: 0.2
-      }
-    ]
-  }, {
-    name: 'Linux Chrome Max Response Time', //select: ['min', 'max'] --> max
-    data: [{ //all values from the max category
-      x: 1519862400000,
-      y: 1.3
-    },
-    {
-      x: 1519862460000,
-      y: 0.9
+    series: [],
+    responsive: {
+      rules: [{
+        condition: {
+          minWidth: 200
+        },
+        credits: {
+          enabled: false
+        }
+      }]
     }
-  ]
-}],
-responsive: {
-  rules: [{
-    condition: {
-      minWidth: 200
-    },
-    credits: {
-      enabled: false
-    }
-  }]
-}
-}
+  }
 
-chart = new Highcharts.Chart(chartingOptions);
+  chart = new Highcharts.Chart(chartingOptions);
 };
 
 //When the document is ready, call the function to initialize the chart.
@@ -109,8 +87,8 @@ function updateChartBoundaries(min, max) {
   chart.xAxis[0].setExtremes(min,max);
 };
 
-//This function will update de extreme values of the Chart on the x axis
-//min and max values.
+//This function will get all the time series from
+//a event object.
 
 function getTimeSeries(jsonEvent, group, select) {
   timestamp = jsonEvent.timestamp;
@@ -136,12 +114,61 @@ function getTimeSeries(jsonEvent, group, select) {
 
 };
 
+//This function will check if a serie already exists in the chart by it's name.
+
+function checkIfSeriesExist(seriesName) {
+  exists = false;
+  for (i in chart.series) {
+    if (seriesName == chart.series[i].name) {
+      exists = true;
+      console.log('Serie existe');
+    }
+  }
+  return exists;
+}
+
+//This function will return the index of a given named series.
+
+function getSeriesIndex(seriesName) {
+  index = null;
+  for (i in chart.series) {
+    if (seriesName == chart.series[i].name) {
+      index = i;
+    }
+  }
+  return index;
+}
+
+//This function will add data to the chart
+//by determinating whether to create a new series or whether to add a new point to an existing series.
+
+function addDataToChart(arrayOfSeries) {
+  for (i = 0; i < arrayOfSeries.length; i++) {
+    currentSeries = arrayOfSeries[i];
+    seriesName = currentSeries[0];
+    seriesPoint = currentSeries[1];
+
+    seriesExists = checkIfSeriesExist(seriesName);
+
+    if(seriesExists == false) {
+      chart.addSeries({
+        name: seriesName, //Returns the name of the series
+        data: [seriesPoint] //Returns the point object {x, y}
+      });
+    } else {
+      seriesIndex = getSeriesIndex(seriesName);
+      chart.series[seriesIndex].addPoint(seriesPoint, false);
+    }
+  }
+};
+
 //This function will recover the data from the textArea, line by line, and
 //parse each string to a JSON Object.
 
 function recoverJSONData() {
-  var textArea = $('#json-data')[0].value;
-  var arrayOfEvents = textArea.split("\n"); //Split the content of textarea by line
+  var editor = ace.edit("editor"); //Find an ace editor instance
+  var rawData = editor.getValue(); //Return the text in the code editor
+  var arrayOfEvents = rawData.split("\n"); //Split the content of textarea by line
   for (i = 0; i < arrayOfEvents.length; i++) { //Transform each line in a JSON Object
     arrayOfEvents[i] = JSON.parse(arrayOfEvents[i]);
   }
@@ -157,20 +184,33 @@ function readEvents() {
   var group = [];
   var select = [];
   var arrayOfEvents = recoverJSONData();
+  console.log(arrayOfEvents);
 
   while(arrayOfEvents[count] != null) { //While there's data, still reading
   currentEvent = arrayOfEvents[count];
   if(currentEvent.type == "start") {
     group = currentEvent.group;
     select = currentEvent.select;
+
     while(currentEvent.type != "stop") { //If it's a start event, only stops if it's a stop event
     count++;
+    console.log(count);
     currentEvent = arrayOfEvents[count];
     if (currentEvent.type == "span") {
       updateChartBoundaries(currentEvent.begin, currentEvent.end);
+    }
+    if (currentEvent.type == "data") {
+      series = getTimeSeries(currentEvent, group, select);
+      console.log(series);
+      addDataToChart(series);
     }
   }
 }
 count++;
 }
+}
+
+function newChart() {
+  initializeChart(); //"Cleans" the chart for a new set of data
+  readEvents();
 }

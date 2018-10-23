@@ -1,3 +1,21 @@
+function initializeCodeEditor() {
+  window.editor = ace.edit("editor");
+  editor.setTheme("ace/theme/clouds_midnight");
+  editor.session.setMode("ace/mode/javascript");
+
+  editor.setOptions({
+    fontFamily: "Source Code Pro",
+    fontSize: "12pt",
+    showLineNumbers: true,
+    vScrollBarAlwaysVisible: true
+  });
+
+  $("#editor").resizable({
+    handleSelector: ".splitter",
+    resizeWidth: false
+  });
+}
+
 var chart = null; //Global variable to store the chart
 
 //This function will initialize a line chart with empy data.
@@ -33,7 +51,10 @@ function initializeChart() {
     legend: {
       layout: 'vertical',
       align: 'right',
-      verticalAlign: 'middle'
+      verticalAlign: 'middle',
+      itemStyle: {
+        fontFamily: 'Source Sans Pro'
+      }
     },
     series: [{
       name: 'Linux Chrome Min Response Time', //select: ['min', 'max'] --> min
@@ -77,14 +98,17 @@ chart = new Highcharts.Chart(chartingOptions);
 
 $( document ).ready(function() {
   initializeChart();
+  initializeCodeEditor();
 });
 
 
 //This function will update de extreme values of the Chart on the x axis
 //min and max values.
+
 function updateChartBoundaries(min, max) {
   chart.xAxis[0].setExtremes(min,max);
 }
+
 
 //This function will recover the data from the textArea, line by line, and
 //parse each string to a JSON Object.

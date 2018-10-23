@@ -10,7 +10,19 @@
   background: blue;
 }
 .textarea {
-  background: green;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+#editor {
+  position: relative;
+  min-height: 100px;
+}
+.splitter {
+  flex: 0 0 auto;
+  height: 18px;
+  background: url(https://raw.githubusercontent.com/RickStrahl/jquery-resizable/master/assets/hsizegrip.png) center center no-repeat #535353;
+  cursor: row-resize;
 }
 .output {
   background: orange;
@@ -30,15 +42,6 @@
   .parent {
     grid-template-columns: 1fr;
   }
-}
-
-textarea {
-  display: block;
-  resize: none;
-  width: 100%;
-  height: 100px;
-  max-width: 100%;
-  max-height: 450px;
 }
 
 .json-data {

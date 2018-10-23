@@ -1,3 +1,5 @@
+var chart = null; //Global variable to store the chart
+
 function initializeCodeEditor() {
   window.editor = ace.edit("editor");
   editor.setTheme("ace/theme/clouds_midnight");
@@ -15,8 +17,6 @@ function initializeCodeEditor() {
     resizeWidth: false
   });
 }
-
-var chart = null; //Global variable to store the chart
 
 //This function will initialize a line chart with empy data.
 
@@ -121,7 +121,6 @@ function checkIfSeriesExist(seriesName) {
   for (i in chart.series) {
     if (seriesName == chart.series[i].name) {
       exists = true;
-      console.log('Serie existe');
     }
   }
   return exists;
@@ -143,21 +142,20 @@ function getSeriesIndex(seriesName) {
 //by determinating whether to create a new series or whether to add a new point to an existing series.
 
 function addDataToChart(arrayOfSeries) {
-  for (i = 0; i < arrayOfSeries.length; i++) {
-    currentSeries = arrayOfSeries[i];
-    seriesName = currentSeries[0];
-    seriesPoint = currentSeries[1];
+  for(i = 0; i < arrayOfSeries.length; i++){
+    //check if the series exists in chart
+    seriesExists = checkIfSeriesExist(arrayOfSeries[i][0]);
 
-    seriesExists = checkIfSeriesExist(seriesName);
-
-    if(seriesExists == false) {
+    //if the series does not exists, then a new series will be created
+    if (seriesExists == false) {
       chart.addSeries({
-        name: seriesName, //Returns the name of the series
-        data: [seriesPoint] //Returns the point object {x, y}
+        name: arrayOfSeries[i][0], //Returns the name of the series
+        data: [arrayOfSeries[i][1]] //Returns the point object {x, y}
       });
     } else {
-      seriesIndex = getSeriesIndex(seriesName);
-      chart.series[seriesIndex].addPoint(seriesPoint, false);
+      //if the series already exists, then create a new data point in it
+      seriesIndex = getSeriesIndex(arrayOfSeries[i][0]);
+      chart.series[seriesIndex].addPoint(arrayOfSeries[i][1], true);
     }
   }
 };
@@ -184,7 +182,6 @@ function readEvents() {
   var group = [];
   var select = [];
   var arrayOfEvents = recoverJSONData();
-  console.log(arrayOfEvents);
 
   while(arrayOfEvents[count] != null) { //While there's data, still reading
   currentEvent = arrayOfEvents[count];
@@ -194,14 +191,13 @@ function readEvents() {
 
     while(currentEvent.type != "stop") { //If it's a start event, only stops if it's a stop event
     count++;
-    console.log(count);
     currentEvent = arrayOfEvents[count];
+    console.log('current event: ', currentEvent)
     if (currentEvent.type == "span") {
       updateChartBoundaries(currentEvent.begin, currentEvent.end);
     }
     if (currentEvent.type == "data") {
       series = getTimeSeries(currentEvent, group, select);
-      console.log(series);
       addDataToChart(series);
     }
   }

@@ -107,8 +107,34 @@ $( document ).ready(function() {
 
 function updateChartBoundaries(min, max) {
   chart.xAxis[0].setExtremes(min,max);
-}
+};
 
+//This function will update de extreme values of the Chart on the x axis
+//min and max values.
+
+function getTimeSeries(jsonEvent, group, select) {
+  timestamp = jsonEvent.timestamp;
+  eventGroup = '';
+  arrayOfSeries = [];
+
+  for (i = 0; i < group.length; i++) {
+    currentGroup = group[i];
+    eventGroup += ' ' + jsonEvent[currentGroup];
+  }
+  eventGroup = eventGroup.replace(/^\s+/,"");
+
+  for (i = 0; i < select.length; i++) {
+    currentSelect = select[i];
+    series = []
+    name = eventGroup + ' ' + select[i];
+    point = {x: timestamp, y: jsonEvent[currentSelect]};
+    series.push(name, point);
+    arrayOfSeries.push(series);
+  }
+
+  return arrayOfSeries;
+
+};
 
 //This function will recover the data from the textArea, line by line, and
 //parse each string to a JSON Object.
@@ -128,11 +154,15 @@ function recoverJSONData() {
 function readEvents() {
   var count = 0;
   var currentEvent = null;
+  var group = [];
+  var select = [];
   var arrayOfEvents = recoverJSONData();
 
   while(arrayOfEvents[count] != null) { //While there's data, still reading
   currentEvent = arrayOfEvents[count];
   if(currentEvent.type == "start") {
+    group = currentEvent.group;
+    select = currentEvent.select;
     while(currentEvent.type != "stop") { //If it's a start event, only stops if it's a stop event
     count++;
     currentEvent = arrayOfEvents[count];
